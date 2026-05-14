@@ -1,0 +1,22 @@
+# Python cache and build artifacts
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+.pytest_cache/
+
+# Virtual environments
+.venv/
+venv/
+
+# Training outputs
+outputs/
+checkpoints/
+logs/
+
+# Local assignment assets
+*.zip
+project.pdf
+
+# Dataset storage
+data/raw/

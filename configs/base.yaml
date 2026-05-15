@@ -1,12 +1,33 @@
 project:
+  name: pix2pix_baseline
+  seed: 42
 
 data:
   dataset_name: maps
+  root_dir: data/raw/maps
+  image_size: [600, 600]
+  channels_in: 3
+  channels_out: 3
+  split:
+    train: 0.7
+    val: 0.15
+    test: 0.15
 
 training:
-
+  batch_size: 8
+  num_epochs: 100
+  lr: 0.0002
+  beta1: 0.5
+  beta2: 0.999
+  lambda_l1: 100.0
+  num_workers: 4
+  device: cuda
 
 model:
-
+  generator_features: 64
+  discriminator_features: 64
 
 logging:
+  output_dir: outputs
+  checkpoint_dir: checkpoints
+  log_every: 50

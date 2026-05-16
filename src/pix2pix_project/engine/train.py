@@ -123,6 +123,11 @@ def run_training(cfg):
     best_val = float("inf")
     num_epochs = cfg["training"]["num_epochs"]
     log_every = cfg["logging"]["log_every"]
+    early_stopping_cfg = cfg["training"].get("early_stopping", {})
+    es_enabled = early_stopping_cfg.get("enabled", True)
+    es_patience = int(early_stopping_cfg.get("patience", 8))
+    es_min_delta = float(early_stopping_cfg.get("min_delta", 0.0))
+    epochs_without_improvement = 0
 
     print(f"Starting training on {device}")
     print(f"Train samples: {len(train_ds)} | Val samples: {len(val_ds)}")
@@ -190,8 +195,9 @@ def run_training(cfg):
             last_path,
         )
 
-        if val_l1 < best_val:
+        if val_l1 < (best_val - es_min_delta):
             best_val = val_l1
+            epochs_without_improvement = 0
             best_path = checkpoint_dir / "best.pt"
             torch.save(
                 {
@@ -206,5 +212,14 @@ def run_training(cfg):
                 best_path,
             )
             print(f"New best checkpoint at epoch {epoch}: {best_path} (Val L1: {val_l1:.4f})")
+        else:
+            epochs_without_improvement += 1
+
+        if es_enabled and epochs_without_improvement >= es_patience:
+            print(
+                f"Early stopping at epoch {epoch}: "
+                f"no Val L1 improvement > {es_min_delta} for {es_patience} epoch(s)."
+            )
+            break
 
     print(f"Training finished. Best Val L1: {best_val:.4f}")

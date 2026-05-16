@@ -20,8 +20,12 @@ training:
   beta1: 0.5
   beta2: 0.999
   lambda_l1: 100.0
-  num_workers: 4
+  num_workers: 2
   device: cuda
+  early_stopping:
+    enabled: true
+    patience: 8
+    min_delta: 0.0
 
 model:
   generator_features: 64

@@ -38,7 +38,7 @@ def _build_test_dataset(cfg) -> PairedImageDataset:
         raise FileNotFoundError(f"Dataset root does not exist: {root}")
 
     size = tuple(cfg["data"]["image_size"])
-    tensor_tf = T.Compose([T.Resize(size), T.ToTensor()])
+    tensor_tf = T.Compose([T.Resize(size), T.ToTensor(), T.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
 
     test_dir = root / "test"
     if test_dir.exists():
@@ -72,7 +72,8 @@ def _load_generator(cfg, checkpoint_path: str, device: str) -> torch.nn.Module:
 
 
 def _to_numpy_image(x: torch.Tensor) -> np.ndarray:
-    return x.detach().cpu().permute(1, 2, 0).numpy().clip(0.0, 1.0)
+    x = x.detach().cpu() * 0.5 + 0.5  # denormalize from [-1,1] to [0,1]
+    return x.permute(1, 2, 0).numpy().clip(0.0, 1.0)
 
 
 def run_evaluation(cfg, checkpoint_path: str):
@@ -97,7 +98,7 @@ def run_evaluation(cfg, checkpoint_path: str):
         for labels, reals in test_loader:
             labels = labels.to(device)
             reals = reals.to(device)
-            fakes = generator(labels).clamp(0.0, 1.0)
+            fakes = generator(labels).clamp(-1.0, 1.0)
 
             batch_size = labels.size(0)
             for i in range(batch_size):

@@ -42,7 +42,9 @@ def _build_datasets(cfg) -> Tuple[PairedImageDataset, PairedImageDataset]:
         raise FileNotFoundError(f"Dataset root does not exist: {root}")
 
     size = tuple(cfg["data"]["image_size"])
-    tensor_tf = T.Compose([T.Resize(size), T.ToTensor()])
+    tensor_tf = T.Compose([T.Resize(size), T.ToTensor(), T.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
+    aug_cfg = cfg["training"].get("augmentation", {})
+    train_hflip_prob = float(aug_cfg.get("hflip_prob", 0.0))
 
     train_dir = root / "train"
     val_dir = root / "val"
@@ -59,7 +61,12 @@ def _build_datasets(cfg) -> Tuple[PairedImageDataset, PairedImageDataset]:
     if len(train_paths) == 0 or len(val_paths) == 0:
         raise ValueError("Train/validation split is empty. Check dataset path and split configuration.")
 
-    train_ds = PairedImageDataset(train_paths, transform_in=tensor_tf, transform_out=tensor_tf)
+    train_ds = PairedImageDataset(
+        train_paths,
+        transform_in=tensor_tf,
+        transform_out=tensor_tf,
+        hflip_prob=train_hflip_prob,
+    )
     val_ds = PairedImageDataset(val_paths, transform_in=tensor_tf, transform_out=tensor_tf)
     return train_ds, val_ds
 
@@ -123,6 +130,7 @@ def run_training(cfg):
     best_val = float("inf")
     num_epochs = cfg["training"]["num_epochs"]
     log_every = cfg["logging"]["log_every"]
+    aug_cfg = cfg["training"].get("augmentation", {})
     early_stopping_cfg = cfg["training"].get("early_stopping", {})
     es_enabled = early_stopping_cfg.get("enabled", True)
     es_patience = int(early_stopping_cfg.get("patience", 8))
@@ -131,6 +139,7 @@ def run_training(cfg):
 
     print(f"Starting training on {device}")
     print(f"Train samples: {len(train_ds)} | Val samples: {len(val_ds)}")
+    print(f"Train augmentation hflip_prob: {float(aug_cfg.get('hflip_prob', 0.0))}")
 
     for epoch in range(1, num_epochs + 1):
         generator.train()

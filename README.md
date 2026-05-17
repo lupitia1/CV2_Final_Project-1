@@ -18,7 +18,7 @@ Main goals:
 Prepare the dataset with:
 
 ```bash
-python scripts/prepare_data.py --zip maps.zip --out data/raw
+python scripts/prepare_data.py --zip maps.zip --out data/raw --dataset-name maps
 ```
 
 ## 3. Environment Setup
@@ -34,8 +34,10 @@ pip install -r requirements.txt
 1. **Prepare data**
 
 ```bash
-python scripts/prepare_data.py --zip maps.zip --out data/raw
+python scripts/prepare_data.py --zip maps.zip --out data/raw --dataset-name maps
 ```
+
+This creates explicit `train/`, `val/`, and `test/` folders under `data/raw/maps`.
 
 2. **Train**
 
@@ -46,13 +48,20 @@ python scripts/train.py --config configs/base.yaml
 3. **Evaluate**
 
 ```bash
-python scripts/evaluate.py --config configs/base.yaml --checkpoint checkpoints/last.pt
+python scripts/evaluate.py --config configs/base.yaml --checkpoint checkpoints/best.pt
 ```
 
-4. **Inference demo**
+4. **Task 2 improvement (augmentation)**
 
 ```bash
-python scripts/infer.py --checkpoint checkpoints/last.pt --input data/raw/maps/test --output outputs/demo_test --paired-input
+python scripts/train.py --config configs/improved_aug.yaml
+python scripts/evaluate.py --config configs/improved_aug.yaml --checkpoint checkpoints_aug/best.pt
+```
+
+5. **Inference demo**
+
+```bash
+python scripts/infer.py --checkpoint checkpoints/best.pt --input data/raw/maps/test --output outputs/demo_test --paired-input
 ```
 
 ## 5. Inference Examples
@@ -62,7 +71,7 @@ python scripts/infer.py --checkpoint checkpoints/last.pt --input data/raw/maps/t
 
 Run the notebook demo:
 
-- Open `demo/demo_notebook.ipynb`
+- Open `demo/colab_runner.ipynb`
 - Set paths in the configuration cell (checkpoint, test image/folder)
 - Run all cells
 

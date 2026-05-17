@@ -47,12 +47,14 @@ def split_paired_image(img: Image.Image) -> Tuple[Image.Image, Image.Image]:
 
 def image_to_tensor(image: Image.Image, device: str) -> torch.Tensor:
     arr = np.array(image).astype(np.float32) / 255.0
+    arr = arr * 2.0 - 1.0  # normalize to [-1, 1]
     tensor = torch.from_numpy(arr).permute(2, 0, 1).unsqueeze(0)
     return tensor.to(device)
 
 
 def tensor_to_image(tensor: torch.Tensor) -> Image.Image:
-    arr = (tensor.squeeze(0).permute(1, 2, 0).cpu().numpy() * 255.0).clip(0, 255).astype(np.uint8)
+    arr = tensor.squeeze(0).permute(1, 2, 0).cpu().numpy()
+    arr = ((arr * 0.5 + 0.5) * 255.0).clip(0, 255).astype(np.uint8)  # denormalize [-1,1] to [0,255]
     return Image.fromarray(arr)
 
 
@@ -97,7 +99,7 @@ def run_inference_on_image(gen: torch.nn.Module, image_path: Path, device: str, 
 
     tensor = image_to_tensor(label, device)
     with torch.no_grad():
-        pred = gen(tensor).clamp(0, 1)
+        pred = gen(tensor).clamp(-1, 1)
 
     pred_img = tensor_to_image(pred)
     return label, pred_img, real

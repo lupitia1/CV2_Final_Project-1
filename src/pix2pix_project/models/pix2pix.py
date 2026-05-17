@@ -3,16 +3,16 @@ from dataclasses import dataclass
 import torch
 import torch.nn as nn
 
-from .discriminator import TinyDiscriminator
-from .generator import TinyGenerator
+from .discriminator import PatchDiscriminator
+from .generator import UNetGenerator
 
 
 def build_generator(in_channels: int = 3, out_channels: int = 3, features: int = 64) -> nn.Module:
-    return TinyGenerator(in_channels=in_channels, out_channels=out_channels, features=features)
+    return UNetGenerator(in_channels=in_channels, out_channels=out_channels, features=features)
 
 
 def build_discriminator(in_channels: int = 6, features: int = 64) -> nn.Module:
-    return TinyDiscriminator(in_channels=in_channels, features=features)
+    return PatchDiscriminator(in_channels=in_channels, features=features)
 
 
 @dataclass

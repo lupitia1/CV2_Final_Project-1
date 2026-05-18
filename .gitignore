@@ -11,7 +11,9 @@ venv/
 
 # Training outputs
 outputs/
+outputs_aug/
 checkpoints/
+checkpoints_aug/
 logs/
 
 # Local assignment assets

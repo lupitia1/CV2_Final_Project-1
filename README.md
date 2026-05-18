@@ -82,7 +82,7 @@ The notebook also generates side-by-side outputs for easier interpretation.
 This repository is organized to support the following deliverables:
 
 1. Training and evaluation scripts.
-2. Checkpoints and generated outputs.
+2. Checkpoints and generated outputs. (In a separated link https://nubeusc-my.sharepoint.com/:f:/g/personal/patriciaguadalupe_alvarenga_rai_usc_es/IgB-HfKqCkyHQqaXK8g01KiZASDtHARgc-Z_Pf1a3iqxBlE?e=fSadey)
 3. Quantitative and qualitative results for final analysis.
 
 ## 7. Notes for Evaluation
